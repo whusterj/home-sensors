@@ -1,0 +1,16 @@
+[Unit]
+Description=Simple sensor data receiver service
+After=syslog.target
+
+[Service]
+Type=idle
+User=pi
+Group=pi
+WorkingDirectory=/opt/wireless/
+ExecStart=/usr/bin/python /opt/wireless/receive.py
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

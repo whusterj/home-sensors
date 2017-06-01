@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sensor Dashboard</title>
+  <style>
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .chart {}
+    .chart .responsive-chart {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="lightAndSoilChart" class="chart responsive-chart"></div>
+    <div id="temperatureChart" class="chart responsive-chart"></div>
+    <div id="pressureChart" class="chart responsive-chart"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.js"></script>
+  <script>
+
+    const SENSORS = {
+      lightAndSoil: {
+        addr: '0',
+        chart: Plotly.d3.select('#lightAndSoilChart'),
+      },
+      tempAndPressure: {
+        addr: '1',
+        temperatureChart: Plotly.d3.select('#temperatureChart'),
+        pressureChart: Plotly.d3.select('#pressureChart'),
+      }
+    };
+
+    window.onresize = handleWindowResize;
+
+    makePlots();
+
+    window.onload = function () {
+      var socket = io.connect(
+        'http://192.168.0.13'
+      );
+      socket.on('connection_confirmed', function (msg) {
+         console.log('CONNECTION CONFIRMED');
+      });
+      socket.on('file_updated', function (msg) {
+         console.log('Server has new data, reloading chart.');
+         makePlots();
+      });
+    }
+
+    /// functions
+
+    function makePlots () {
+      Plotly.d3.csv('/data/recent-data.csv', processData)
+    }
+
+    function processData (allRows) {
+
+      if (!allRows) { throw Error('Failed to load CSV data.'); }
+
+      console.log('CSV Data: ', allRows);
+
+      // Light and Soil Sensor
+      SENSORS.lightAndSoil.light_trace = TraceFactory({ name: 'Sunlight' });
+      SENSORS.lightAndSoil.soil_trace = TraceFactory({ name: 'Soil Humidity' });
+      SENSORS.lightAndSoil.battery_trace = TraceFactory({ name: 'Battery' });
+
+      // Temp and Pressure Sensor
+      SENSORS.tempAndPressure.temp_trace = TraceFactory({ name: 'Temperature' });
+      SENSORS.tempAndPressure.pressure_trace = TraceFactory({ name: 'Pressure' });
+      SENSORS.tempAndPressure.battery_trace = TraceFactory({ name: 'Battery' });
+
+      for (let i=0; i<allRows.length; i++) {
+        row = allRows[i];
+        if (row.source_addr === SENSORS.lightAndSoil.addr) {
+          SENSORS.lightAndSoil.light_trace.x.push(row.timestamp);
+          SENSORS.lightAndSoil.light_trace.y.push(row.light_val);
+          SENSORS.lightAndSoil.soil_trace.x.push(row.timestamp);
+          SENSORS.lightAndSoil.soil_trace.y.push(row.soil_val);
+          SENSORS.lightAndSoil.battery_trace.x.push(row.timestamp);
+          SENSORS.lightAndSoil.battery_trace.y.push(row.battery);
+        } else if (row.source_addr === SENSORS.tempAndPressure.addr) {
+          SENSORS.tempAndPressure.temp_trace.x.push(row.timestamp);
+          SENSORS.tempAndPressure.temp_trace.y.push(row.light_val);
+          SENSORS.tempAndPressure.pressure_trace.x.push(row.timestamp);
+          SENSORS.tempAndPressure.pressure_trace.y.push(row.soil_val);
+          SENSORS.tempAndPressure.battery_trace.x.push(row.timestamp);
+          SENSORS.tempAndPressure.battery_trace.y.push(row.battery);
+        }
+      }
+
+      makeLightAndSoilChart();
+      makeTempChart();
+      makePressureChart();
+
+    }
+
+    function makeTempChart () {
+      data = [SENSORS.tempAndPressure.temp_trace];
+
+      var layout = {
+        title: 'Temperature',
+        yaxis: {
+          range: [0, 50],
+          fixedrange: true,
+        },
+        xaxis: {fixedrange: true, },
+      };
+
+      Plotly.newPlot(SENSORS.tempAndPressure.temperatureChart.node(), data, layout,
+                     {displayModeBar: false});
+    }
+
+    function makePressureChart () {
+
+      data = [SENSORS.tempAndPressure.pressure_trace];
+
+      var layout = {
+        title: 'Barometric Pressure',
+        yaxis: {
+          fixedrange: true,
+        },
+        xaxis: {fixedrange: true, },
+      };
+
+      Plotly.newPlot(SENSORS.tempAndPressure.pressureChart.node(), data, layout,
+                     {displayModeBar: false});
+
+    }
+
+    function makeLightAndSoilChart () {
+
+      data = [SENSORS.lightAndSoil.light_trace,
+              SENSORS.lightAndSoil.soil_trace,
+              SENSORS.lightAndSoil.battery_trace];
+
+      var layout = {
+        title: 'Light and Soil Sensor',
+        yaxis: {
+          range: [0, 255],
+          fixedrange: true,
+        },
+        xaxis: {fixedrange: true, },
+      };
+
+      Plotly.newPlot(SENSORS.lightAndSoil.chart.node(), data, layout,
+                     {displayModeBar: false});
+
+    }
+
+    function handleWindowResize () {
+      Plotly.Plots.resize(SENSORS.lightAndSoil.chart.node());
+      Plotly.Plots.resize(SENSORS.tempAndPressure.temperatureChart.node());
+      Plotly.Plots.resize(SENSORS.tempAndPressure.pressureChart.node());
+    }
+
+    function TraceFactory (opts) {
+      return {
+        name: opts.name || '',
+        x: [],
+        y: []
+      }
+    }
+
+  </script>
+</body>
+</html>
