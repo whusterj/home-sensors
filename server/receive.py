@@ -51,7 +51,7 @@ while True:
 
     recv_buffer = []
     radio.read(recv_buffer, radio.getDynamicPayloadSize())
-    print 'Received Buffer: {}'.format(recv_buffer)
+    print(f'Received Buffer: {recv_buffer}')
 
     # The radio can only send bytes (integer from 0 to 255)
     # So we must translate the receivedMessage into unicode characters...
@@ -61,15 +61,15 @@ while True:
             break
         if (n >= 32 and n <= 126):           # Decode into ASCII
             string += chr(n)
-    print 'Received: {}'.format(string)
+    print(f'Received: {string}')
 
     # The received string should be a comma-delimited list
     data = string.split(',')
-    print 'data:', data
+    print('data:', data)
 
     timestamp = datetime.now()
     fields = [timestamp.isoformat()] + data
-    print ','.join([str(field) for field in fields])
+    print('Fields:', ','.join([str(field) for field in fields]))
 
     # Echo the packet number (first item in list)
     radio.writeAckPayload(1, [int(data[1])], 1)
