@@ -6,8 +6,8 @@ After=syslog.target
 Type=idle
 User=pi
 Group=pi
-WorkingDirectory=/opt/wireless/
-ExecStart=/usr/bin/python /opt/wireless/receive.py
+WorkingDirectory=/opt/wireless/server/
+ExecStart=/opt/venv/bin/python /opt/wireless/server/receive.py
 StandardOutput=syslog
 StandardError=syslog
 

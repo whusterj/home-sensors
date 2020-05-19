@@ -43,7 +43,7 @@
 
     window.onload = function () {
       var socket = io.connect(
-        'http://192.168.0.13'
+        'http://192.168.0.14'
       );
       socket.on('connection_confirmed', function (msg) {
          console.log('CONNECTION CONFIRMED');
@@ -105,7 +105,7 @@
       data = [SENSORS.tempAndPressure.temp_trace];
 
       var layout = {
-        title: 'Temperature',
+        title: 'Temperature C°',
         yaxis: {
           range: [0, 50],
           fixedrange: true,

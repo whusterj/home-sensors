@@ -40,7 +40,7 @@ def make_recent_data_csv(file_names=None, out_file='/opt/wireless/data/recent-da
     if file_names is None:
         file_names = _get_recent_file_names()
 
-    print 'Merging data from files: ', file_names
+    print('Merging data from files: ', file_names)
 
     # Get all rows from all files
     all_rows = []

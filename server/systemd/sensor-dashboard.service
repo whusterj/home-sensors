@@ -8,7 +8,7 @@ User=pi
 Group=pi
 Environment=FLASK_APP=sensors.py
 WorkingDirectory=/opt/wireless/server/
-ExecStart=/home/pi/.virtualenvs/wireless/bin/python runserver.py
+ExecStart=/opt/venv/bin/python runserver.py
 StandardOutput=syslog
 StandardError=syslog
 

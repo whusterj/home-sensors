@@ -27,13 +27,15 @@ and manage this script.
 The Python dependencies can be found in requirements.txt and installed with the
 command:
 
-    python3 -m pip install -t requirements.txt
+    python3 -m pip install -r requirements.txt
 
 ## Installation
 
 Install system-level dependencies:
 
-    sudo apt-get install python-pip python-virtualenv nginx python-rpi.gpio python3-rpi.gpio
+    sudo apt-get install python-pip python-virtualenv nginx \
+                         python-rpi.gpio python3-rpi.gpio \
+                         gcc build-essential redis
 
 The Python code and configuration files are designed to run on debian-based
 Linux (Raspbian, Ubuntu, etc.), so bear that in mind!
@@ -59,6 +61,14 @@ After editing it, reload the startup file (e.g., run source ~/.bashrc).
 
 You can now switch Python virtual environments using the `workon` command and
 create new environments with the `mkvirtualenv` command.
+
+Create a virtual env called 'wireless' using the system Python 3:
+
+    mkvirtualenv wireless --python python3
+
+And install the Python dependencies inside of it:
+
+    python -m pip install -r requirements.txt
 
 Now you should be able to run the Python receiver:
 
@@ -89,14 +99,18 @@ Create a symlink from `/opt` to the repository directory.
 
 Install the nginx configuration:
 
-    sudo ln -s ~/home-sensors/nginx/sensors.conf /etc/nginx/sites-available/
-    sudo ln -s /etc/nginx/sites-available/sesnors.conf /etc/nginx/sites-enabled/
+    sudo ln -s ~/home-sensors/server/nginx/sensors.conf /etc/nginx/sites-available/
+    sudo ln -s /etc/nginx/sites-available/sensors.conf /etc/nginx/sites-enabled/
+
+Remove the default nginx configuration (if necessary)
+
+    sudo unlink /etc/nginx/sites-enabled/default
 
 Install the systemd scripts:
 
     sudo cp ~/home-sensors/server/systemd/sensor-dashboard.service /lib/systemd/system/
-    sudo cp ~/home-sensors/server/systemd/sensor-receiver.service /lib/systemd/system/ sudo
-    systemctl enable sensor-dashboard sensor-receiver sudo systemctl start
-    sensor-dashboard sensor-receiver
+    sudo cp ~/home-sensors/server/systemd/sensor-receiver.service /lib/systemd/system/
+    sudo systemctl enable sensor-dashboard sensor-receiver
+    sudo systemctl start sensor-dashboard sensor-receiver
 
 

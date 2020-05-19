@@ -8,7 +8,8 @@
 import eventlet
 eventlet.monkey_patch()
 
-import os, md5, time
+import os
+import time
 import dateutil
 
 from flask import Flask, render_template, send_from_directory
@@ -51,7 +52,7 @@ def ws_disconnect():
 
 
 def bg_file_watch_thread():
-    print 'Started background file watch thread'
+    print('Started background file watch thread')
     # Get the latest data file
     data_dir = '/opt/wireless/data/'
     last_file_size = None
@@ -59,7 +60,7 @@ def bg_file_watch_thread():
     latest_file_date = None
 
     while True:
-        print 'Checking for file updates'
+        print('Checking for file updates')
         for file in os.listdir(data_dir):
             if file.startswith('.'):
                 continue
@@ -70,7 +71,7 @@ def bg_file_watch_thread():
                     latest_file_date = date
                     latest_file = file
 
-        print 'Getting info for file: {}'.format(latest_file)
+        print('Getting info for file: {}'.format(latest_file))
 
         try:
             new_size = os.stat(os.path.join(data_dir, latest_file)).st_size
@@ -78,11 +79,11 @@ def bg_file_watch_thread():
             # The file was removed or something
             new_size = None
 
-        print 'comparing {} with {}'.format(new_size, last_file_size)
+        print('comparing {} with {}'.format(new_size, last_file_size))
         if new_size != last_file_size:
-            print 'Making recent-data.csv'
+            print('Making recent-data.csv')
             make_recent_data_csv()
-            print 'Emitting file_updated event'
+            print('Emitting file_updated event')
             sio.emit('file_updated')
             last_file_size = new_size
 

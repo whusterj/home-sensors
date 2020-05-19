@@ -4,3 +4,4 @@ logs/
 *.db
 *.hex
 .data/
+/data/
