@@ -126,7 +126,7 @@ void loop(void) {
   Serial.flush();
 #endif
 
-  if (loop_count >= 37) {                                   // Read the sensors approx every 5 minutes (37 * 8 secs)
+  if (loop_count >= 1) {                                   // Read the sensors approx every 5 minutes (37 * 8 secs)
   
     //float v = vcc.Read_Volts();
     float battery_perc = vcc.Read_Perc(VCC_MIN, VCC_MAX);
