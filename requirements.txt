@@ -6,7 +6,7 @@ Flask==1.0
 Flask-SocketIO==2.8.6
 greenlet==0.4.15
 itsdangerous==0.24
-Jinja2==2.9.6
+Jinja2==2.11.3
 MarkupSafe==1.0
 pyinotify==0.9.6
 python-dateutil==2.6.0
